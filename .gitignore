@@ -1,0 +1,45 @@
+HELP.md
+target/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.jar
+
+### IDE ###
+.idea/
+*.iml
+*.iws
+.ipr
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+.springBeans
+.sts4-cache
+
+### OS ###
+.DS_Store
+Thumbs.db
+desktop.ini
+
+### Secrets ###
+.env
+.env.local
+*.pem
+application-local.properties
+application-local.yml
+
+### Runtime data ###
+data/*.db
+data/*.mv.db
+data/*.trace.db
+*.sqlite
+logs/
+*.log
+
+### Local runtime dirs ###
+.venv-clip/
+data/clip-model/
+data/anime-index/
+uploads/

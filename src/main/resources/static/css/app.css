@@ -1,0 +1,36 @@
+﻿/* AnimeAI Global Styles */
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh;color:#e0e0e0;line-height:1.6;background:#0f0f23}
+a{color:#6c5ce7;text-decoration:none}
+
+/* ---- Auth Pages ---- */
+.auth-overlay{display:flex;align-items:center;justify-content:center;min-height:100vh;background:rgba(15,15,35,0.7)}
+.auth-card{background:#1e1e32;border-radius:16px;padding:35px 30px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.5);border:1px solid #2a2a4a}
+.brand{text-align:center;margin-bottom:24px}
+.brand .logo{font-size:36px;display:block}
+.brand h1{font-size:22px;margin:6px 0}
+.brand p{font-size:13px;color:#8888aa}
+.auth-tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid #2a2a4a}
+.auth-tabs .tab{flex:1;text-align:center;padding:10px;font-size:15px;color:#8888aa;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.2s}
+.auth-tabs .tab.active{color:#6c5ce7;border-bottom-color:#6c5ce7;font-weight:bold}
+.auth-tabs .tab:hover{color:#6c5ce7}
+
+form label{display:block;font-size:13px;color:#aaa;margin:12px 0 4px;font-weight:500}
+form label .req{color:#e74c3c}
+form input{width:100%;padding:10px 12px;border:1.5px solid #2a2a4a;border-radius:8px;font-size:14px;transition:.2s;background:#0f0f23;color:#e0e0e0}
+form input:focus{outline:none;border-color:#6c5ce7;background:#1a1a2e}
+.pw-row{display:flex;gap:8px}
+.pw-row input{flex:1}
+.pw-row button{background:#2a2a4a;border:1.5px solid #3a3a5a;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:14px;color:#aaa}
+.primary-btn{width:100%;padding:12px;background:linear-gradient(135deg,#6c5ce7,#5a4bd1);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;margin-top:16px;transition:.2s}
+.primary-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(108,92,231,0.4)}
+.text-btn{background:none;border:none;color:#aaa;cursor:pointer;font-size:13px}
+.text-btn:hover{color:#fff}
+.server-msg{padding:8px 12px;border-radius:6px;font-size:13px;margin-bottom:12px;display:none}
+.server-msg.success{display:block;background:rgba(46,204,113,.15);color:#2ecc71}
+.server-msg.error{display:block;background:rgba(231,76,60,.15);color:#e74c3c}
+
+/* ---- Topbar ---- */
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:#1a1a2e;border-bottom:1px solid #2a2a4a;color:#e0e0e0}
+.topbar-brand{font-size:16px;font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:12px;font-size:13px}

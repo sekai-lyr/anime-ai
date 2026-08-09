@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AnimeAI · 跨越时间与天空的相遇</title>
+<style>
+/* ===== CSS Variables ===== */
+:root {
+  --deep-blue: #0f1b4d;
+  --sky-blue: #4facfe;
+  --cyan: #00d2ff;
+  --gold: #f7a52a;
+  --sunset-pink: #ff7b9c;
+  --sunset-orange: #ff6b4a;
+  --starry-purple: #6b3fa0;
+  --starry-deep: #0a0a2e;
+  --cloud-white: #f8f9ff;
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255,255,255,0.82);
+  --glass-bg: rgba(255,255,255,0.08);
+  --glass-border: rgba(255,255,255,0.18);
+  --glass-highlight: rgba(255,255,255,0.25);
+  --shadow-cinematic: 0 8px 40px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.06) inset;
+  --shadow-card: 0 12px 50px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1) inset;
+  --spacing-xs: 6px;
+  --spacing-sm: 12px;
+  --spacing-md: 24px;
+  --spacing-lg: 48px;
+  --spacing-xl: 80px;
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
+  --radius-xl: 40px;
+  --font-title: "Noto Serif SC", "Source Han Serif SC", "SimSun", "STSong", serif;
+  --font-body: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --transition-smooth: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ===== Reset ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{font-family:var(--font-body);color:var(--text-primary);background:#0a0a2e;overflow-x:hidden;line-height:1.6}
+
+/* ===== Canvas Background ===== */
+#skyCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* ===== Content Wrapper ===== */
+.content-overlay{position:relative;z-index:1}
+
+/* ===== Navigation ===== */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px clamp(20px,6vw,80px);backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);background:rgba(255,255,255,0.06);border-bottom:1px solid var(--glass-border);transition:background var(--transition-smooth)}
+.nav.scrolled{background:rgba(255,255,255,0.1)}
+.nav-brand{font-family:var(--font-title);font-size:20px;font-weight:700;letter-spacing:0.04em;color:var(--text-primary);text-shadow:0 2px 16px rgba(79,172,254,0.3);display:flex;align-items:center;gap:10px}
+.nav-brand::before{content:'';width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--sky-blue),var(--cyan));box-shadow:0 0 20px rgba(79,172,254,0.4)}
+.nav-links{display:flex;gap:28px;align-items:center}
+.nav-links a{color:var(--text-secondary);text-decoration:none;font-size:14px;font-weight:500;letter-spacing:0.02em;transition:color var(--transition-smooth);position:relative}
+.nav-links a:hover{color:var(--text-primary)}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1.5px;background:var(--sky-blue);transition:width var(--transition-smooth);border-radius:1px}
+.nav-links a:hover::after{width:100%}
+
+/* ===== Hero Section ===== */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:clamp(20px,4vw,60px);position:relative}
+.hero-eyebrow{font-family:var(--font-body);font-size:clamp(12px,1.5vw,14px);letter-spacing:0.25em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:var(--spacing-md);opacity:0;animation:fadeInUp 0.8s ease-out 0.1s forwards}
+.hero-title{font-family:var(--font-title);font-size:clamp(36px,7vw,84px);font-weight:900;line-height:1.15;letter-spacing:0.04em;margin-bottom:var(--spacing-sm);opacity:0;animation:fadeInUp 0.8s ease-out 0.3s forwards;text-shadow:0 4px 40px rgba(0,0,0,0.3),0 0 80px rgba(79,172,254,0.15)}
+.hero-title .line2{display:block;background:linear-gradient(135deg,#ffffff 30%,var(--gold) 70%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-subtitle{font-family:var(--font-title);font-size:clamp(16px,2.5vw,22px);color:var(--text-secondary);letter-spacing:0.12em;margin-bottom:var(--spacing-lg);opacity:0;animation:fadeInUp 0.8s ease-out 0.5s forwards;text-shadow:0 2px 20px rgba(0,0,0,0.2)}
+.hero-actions{display:flex;gap:var(--spacing-md);flex-wrap:wrap;justify-content:center;opacity:0;animation:fadeInUp 0.8s ease-out 0.7s forwards}
+
+/* ===== CTA Button ===== */
+.btn-primary{position:relative;display:inline-flex;align-items:center;gap:10px;padding:16px 42px;font-family:var(--font-body);font-size:16px;font-weight:600;letter-spacing:0.06em;color:white;text-decoration:none;border:none;border-radius:var(--radius-xl);cursor:pointer;background:linear-gradient(135deg,var(--sky-blue),var(--cyan),#a18cd1);background-size:200% 200%;animation:gradientShift 3s ease-in-out infinite;box-shadow:0 8px 32px rgba(79,172,254,0.35),0 0 60px rgba(79,172,254,0.15);transition:transform var(--transition-bounce),box-shadow var(--transition-smooth);overflow:visible;z-index:1}
+.btn-primary::before{content:'';position:absolute;inset:-3px;border-radius:inherit;background:inherit;filter:blur(18px);opacity:0.5;z-index:-1;transition:opacity var(--transition-smooth),filter var(--transition-smooth)}
+.btn-primary:hover{transform:translateY(-4px) scale(1.03);box-shadow:0 16px 48px rgba(79,172,254,0.5),0 0 100px rgba(79,172,254,0.25)}
+.btn-primary:hover::before{opacity:0.8;filter:blur(28px)}
+.btn-primary:active{transform:translateY(-1px) scale(0.98)}
+.btn-arrow{display:inline-block;transition:transform var(--transition-smooth)}
+.btn-primary:hover .btn-arrow{transform:translateX(5px)}
+.btn-secondary{display:inline-flex;align-items:center;padding:16px 36px;font-size:15px;font-weight:500;color:var(--text-primary);text-decoration:none;border-radius:var(--radius-xl);border:1.5px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:all var(--transition-smooth)}
+.btn-secondary:hover{border-color:var(--glass-highlight);background:rgba(255,255,255,0.14);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.15)}
+
+/* ===== Scroll Indicator ===== */
+.scroll-indicator{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:fadeInUp 0.8s ease-out 1.2s forwards}
+.scroll-indicator span{font-size:11px;letter-spacing:0.2em;color:var(--text-secondary);text-transform:uppercase}
+.scroll-line{width:1.5px;height:40px;background:linear-gradient(to bottom,var(--glass-highlight),transparent);border-radius:1px;animation:scrollPulse 2s ease-in-out infinite}
+
+/* ===== Feature Cards Section ===== */
+.features{padding:var(--spacing-xl) clamp(20px,6vw,80px);position:relative}
+.features-header{text-align:center;margin-bottom:var(--spacing-xl)}
+.features-header h2{font-family:var(--font-title);font-size:clamp(24px,3.5vw,40px);font-weight:700;letter-spacing:0.04em;margin-bottom:var(--spacing-sm);text-shadow:0 2px 20px rgba(0,0,0,0.2)}
+.features-header p{font-size:15px;color:var(--text-secondary);max-width:600px;margin:0 auto}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--spacing-md);max-width:1200px;margin:0 auto}
+
+/* ===== Glass Card ===== */
+.glass-card{position:relative;padding:36px 28px;border-radius:var(--radius-lg);cursor:pointer;text-decoration:none;color:var(--text-primary);overflow:hidden;transition:all 0.45s cubic-bezier(0.25,0.46,0.45,0.94);transform-style:preserve-3d;perspective:800px}
+.glass-card::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(160deg,rgba(255,255,255,0.12),rgba(255,255,255,0.03));backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--glass-border);box-shadow:var(--shadow-card);transition:all 0.45s cubic-bezier(0.25,0.46,0.45,0.94);z-index:0}
+.glass-card::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,0.07) 47%,transparent 60%);background-size:200% 100%;z-index:1;pointer-events:none;transition:background-position 0.6s ease}
+.glass-card:hover{transform:translateY(-10px) rotateX(2deg) rotateY(-2deg)}
+.glass-card:hover::before{border-color:var(--glass-highlight);box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 0 1px rgba(255,255,255,0.15) inset,0 0 40px rgba(79,172,254,0.08)}
+.glass-card:hover::after{background-position:200% 0}
+.glass-card:active{transform:translateY(-4px) rotateX(1deg)}
+.card-icon{position:relative;z-index:2;width:52px;height:52px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:var(--spacing-md);background:linear-gradient(135deg,rgba(255,255,255,0.15),rgba(255,255,255,0.04));border:1px solid rgba(255,255,255,0.15);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:all var(--transition-smooth)}
+.glass-card:hover .card-icon{background:linear-gradient(135deg,rgba(79,172,254,0.25),rgba(0,210,255,0.1));border-color:rgba(79,172,254,0.4);box-shadow:0 0 24px rgba(79,172,254,0.2)}
+.card-title{position:relative;z-index:2;font-family:var(--font-title);font-size:20px;font-weight:700;letter-spacing:0.03em;margin-bottom:var(--spacing-sm)}
+.card-desc{position:relative;z-index:2;font-size:13px;line-height:1.7;color:var(--text-secondary)}
+.card-shine{position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.06) 0%,transparent 60%);z-index:0;pointer-events:none;transition:opacity var(--transition-smooth);opacity:0}
+.glass-card:hover .card-shine{opacity:1}
+
+/* ===== Train Section ===== */
+.train-section{position:relative;margin:var(--spacing-xl) 0;padding:clamp(40px,8vw,100px) clamp(20px,6vw,80px);overflow:hidden}
+.train-scene{position:relative;max-width:1000px;margin:0 auto;border-radius:var(--radius-xl);overflow:hidden;background:linear-gradient(180deg,rgba(20,30,60,0.7),rgba(10,15,35,0.85));border:1px solid var(--glass-border);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:var(--shadow-cinematic);min-height:300px}
+.train-sky{position:absolute;top:0;left:0;right:0;height:65%;background:linear-gradient(180deg,#1a1a3e 0%,#3d2b5a 30%,#6b3a5a 60%,#d4784a 100%);transition:opacity 0.1s linear}
+.train-stars{position:absolute;top:10%;left:0;right:0;height:30%}
+.train-star{position:absolute;width:2px;height:2px;background:white;border-radius:50%;animation:twinkle var(--duration) ease-in-out infinite;animation-delay:var(--delay)}
+.train-city{position:absolute;bottom:35%;left:0;right:0;height:35%}
+.city-building{position:absolute;bottom:0;background:rgba(15,20,50,0.9);border-radius:2px 2px 0 0}
+.city-window{position:absolute;width:3px;height:3px;background:rgba(255,200,150,0.8);border-radius:1px;animation:windowGlow var(--duration) ease-in-out infinite;animation-delay:var(--delay)}
+.train-rail{position:absolute;bottom:25%;left:0;right:0;height:10%;display:flex;align-items:flex-end}
+.train-track{width:100%;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);position:relative}
+.train-track::after{content:'';position:absolute;top:-6px;left:0;right:0;height:1px;background:rgba(255,255,255,0.1)}
+.train-wires{position:absolute;bottom:26%;left:0;right:0;height:2px;display:flex;justify-content:space-between;padding:0 10%}
+.train-wire{width:100%;height:1px;background:rgba(255,255,255,0.12);position:relative;margin-bottom:8px}
+.train-wire-pole{position:absolute;bottom:-15px;width:2px;height:20px;background:rgba(255,255,255,0.15)}
+.train-car{position:absolute;bottom:22%;left:15%;width:160px;height:45px;background:linear-gradient(180deg,rgba(200,210,230,0.9),rgba(150,160,180,0.8));border-radius:6px 6px 4px 4px;box-shadow:0 4px 20px rgba(0,0,0,0.3);animation:trainMove 12s linear infinite;z-index:3}
+.train-car::before{content:'';position:absolute;top:-12px;left:8px;right:8px;height:14px;background:rgba(180,190,210,0.7);border-radius:4px 4px 0 0}
+.train-car::after{content:'';position:absolute;bottom:-5px;left:12px;right:12px;height:6px;background:rgba(40,40,50,0.8);border-radius:0 0 3px 3px}
+.train-windows{position:absolute;top:2px;left:12px;right:12px;height:30px;display:flex;gap:6px;justify-content:center}
+.train-window{flex:1;background:rgba(255,220,150,0.9);border-radius:2px;box-shadow:0 0 8px rgba(255,200,100,0.4)}
+.train-light{position:absolute;top:-8px;right:-4px;width:10px;height:8px;background:#ffdd80;border-radius:50%;box-shadow:0 0 16px #ffdd80,0 0 30px rgba(255,200,100,0.5)}
+.train-car2{left:55%;bottom:22%;animation-delay:-6s;width:120px}
+.train-section-label{position:relative;z-index:5;text-align:center;padding:var(--spacing-lg) 0 var(--spacing-sm)}
+.train-section-label h3{font-family:var(--font-title);font-size:clamp(20px,3vw,32px);font-weight:700;letter-spacing:0.06em}
+.train-section-label p{font-size:13px;color:var(--text-secondary);margin-top:var(--spacing-xs)}
+
+/* ===== Footer ===== */
+.footer{position:relative;z-index:1;text-align:center;padding:var(--spacing-lg) var(--spacing-md) var(--spacing-xl);border-top:1px solid var(--glass-border)}
+.footer-links{display:flex;gap:var(--spacing-md);justify-content:center;flex-wrap:wrap;margin-bottom:var(--spacing-md)}
+.footer-links a{color:var(--text-secondary);text-decoration:none;font-size:13px;transition:color var(--transition-smooth)}
+.footer-links a:hover{color:var(--text-primary)}
+.footer-copy{font-size:12px;color:rgba(255,255,255,0.45)}
+
+/* ===== Keyframes ===== */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes scrollPulse{0%,100%{opacity:0.3;transform:scaleY(0.8)}50%{opacity:1;transform:scaleY(1)}}
+@keyframes twinkle{0%,100%{opacity:0.3}50%{opacity:1}}
+@keyframes windowGlow{0%,100%{opacity:0.4}50%{opacity:1}}
+@keyframes trainMove{0%{transform:translateX(-60px)}100%{transform:translateX(calc(100vw + 60px))}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes meteorShoot{0%{transform:translate(0,0);opacity:1}70%{opacity:1}100%{transform:translate(-300px,200px);opacity:0}}
+
+/* ===== prefers-reduced-motion ===== */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;scroll-behavior:auto!important}
+  .glass-card:hover{transform:none}
+  .btn-primary:hover{transform:none}
+  #skyCanvas{display:none}
+  body{background:linear-gradient(180deg,#1a2a6c,#4facfe,#0f0c29)}
+}
+
+/* ===== Mobile ===== */
+@media(max-width:768px){
+  .nav-links{gap:16px}
+  .nav-links a{font-size:12px}
+  .features-grid{grid-template-columns:1fr;gap:var(--spacing-sm)}
+  .glass-card{padding:28px 22px}
+  .train-scene{min-height:200px}
+  .train-car{width:100px;height:30px;bottom:20%}
+  .train-car2{width:80px;bottom:20%}
+  .hero-title{letter-spacing:0.02em}
+  .train-section{padding:20px;margin:40px 0}
+}
+@media(max-width:480px){
+  .nav{padding:12px 16px}
+  .nav-brand{font-size:16px}
+  .nav-brand::before{width:24px;height:24px}
+  .hero{padding:80px 16px 40px}
+  .hero-actions{flex-direction:column;align-items:center;width:100%}
+  .btn-primary,.btn-secondary{width:100%;justify-content:center;padding:14px 28px}
+  .glass-card{padding:24px 18px}
+  .card-title{font-size:18px}
+}
+</style>
+</head>
+<body>
+
+<canvas id="skyCanvas"></canvas>
+
+<div class="content-overlay">
+
+  <nav class="nav" id="nav">
+    <div class="nav-brand">AnimeAI</div>
+    <div class="nav-links">
+      <a href="#">探索</a>
+      <a href="#">创作</a>
+      <a href="#">关于</a>
+    </div>
+  </nav>
+
+  <section class="hero" id="hero">
+    <p class="hero-eyebrow">Beyond the Horizon</p>
+    <h1 class="hero-title">
+      天空の物語
+      <span class="line2">云端之上</span>
+    </h1>
+    <p class="hero-subtitle">跨越时间与天空的相遇</p>
+    <div class="hero-actions">
+      <button class="btn-primary" id="btnPrimary">
+        开始旅程
+        <span class="btn-arrow">→</span>
+      </button>
+      <a href="#" class="btn-secondary">了解更多</a>
+    </div>
+    <div class="scroll-indicator">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <div class="features-header" data-reveal>
+      <h2>创作的无限可能</h2>
+      <p>将想象力转化为动画世界的每一个细节</p>
+    </div>
+    <div class="features-grid">
+      <div class="glass-card" data-reveal>
+        <div class="card-shine"></div>
+        <div class="card-icon">🎭</div>
+        <div class="card-title">角色设定</div>
+        <div class="card-desc">深入塑造角色的性格、外貌和内心世界，让每个角色都有独特的灵魂。</div>
+      </div>
+      <div class="glass-card" data-reveal>
+        <div class="card-shine"></div>
+        <div class="card-icon">🌏</div>
+        <div class="card-title">世界观</div>
+        <div class="card-desc">构建宏大而细腻的世界背景，从物理法则到文化脉络，打造可信的虚构世界。</div>
+      </div>
+      <div class="glass-card" data-reveal>
+        <div class="card-shine"></div>
+        <div class="card-icon">🎬</div>
+        <div class="card-title">分镜脚本</div>
+        <div class="card-desc">设计镜头语言与叙事节奏，将文字转化为具有电影感的视觉分镜。</div>
+      </div>
+      <div class="glass-card" data-reveal>
+        <div class="card-shine"></div>
+        <div class="card-icon">🏙️</div>
+        <div class="card-title">场景生成</div>
+        <div class="card-desc">从天空到城市，从教室到旷野，智能生成每一帧的壮丽背景。</div>
+      </div>
+      <div class="glass-card" data-reveal>
+        <div class="card-shine"></div>
+        <div class="card-icon">🤖</div>
+        <div class="card-title">AI 编剧</div>
+        <div class="card-desc">AI 辅助故事创作，提供情节建议、对话润色和叙事结构优化。</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="train-section" id="trainSection">
+    <div class="train-section-label">
+      <h3>黄昏特急</h3>
+      <p>穿过城市与暮色，驶向星光闪耀的远方</p>
+    </div>
+    <div class="train-scene" id="trainScene">
+      <div class="train-sky"></div>
+      <div class="train-city" id="trainCity"></div>
+      <div class="train-wires">
+        <div class="train-wire"><div class="train-wire-pole" style="left:5%"></div></div>
+        <div class="train-wire"><div class="train-wire-pole" style="left:25%"></div></div>
+        <div class="train-wire"><div class="train-wire-pole" style="left:50%"></div></div>
+        <div class="train-wire"><div class="train-wire-pole" style="left:75%"></div></div>
+      </div>
+      <div class="train-rail"><div class="train-track"></div></div>
+      <div class="train-car">
+        <div class="train-windows">
+          <div class="train-window"></div>
+          <div class="train-window"></div>
+          <div class="train-window"></div>
+          <div class="train-window"></div>
+        </div>
+        <div class="train-light"></div>
+      </div>
+      <div class="train-car train-car2">
+        <div class="train-windows">
+          <div class="train-window"></div>
+          <div class="train-window"></div>
+          <div class="train-window"></div>
+        </div>
+        <div class="train-light"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="#">关于我们</a>
+      <a href="#">创作指南</a>
+      <a href="#">加入社区</a>
+      <a href="#">隐私条款</a>
+    </div>
+    <p class="footer-copy">&copy; 2026 AnimeAI. 所有画面皆为想象之翼。</p>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const canvas = document.getElementById('skyCanvas');
+  const ctx = canvas.getContext('2d');
+  const trainSection = document.getElementById('trainSection');
+  const nav = document.getElementById('nav');
+  const btnPrimary = document.getElementById('btnPrimary');
+
+  let W, H;
+  let scrollProgress = 0;
+  let targetProgress = 0;
+  let mouseX = 0.5;
+  let mouseY = 0.5;
+  let time = 0;
+  let particles = [];
+  let shootingStars = [];
+  let clouds = [];
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    if(particles.length === 0) initParticles();
+    initClouds();
+  }
+
+  function lerp(a,b,t){return a+(b-a)*t}
+  function lerpColor(c1,c2,t){
+    const r1=parseInt(c1.slice(1,3),16),g1=parseInt(c1.slice(3,5),16),b1=parseInt(c1.slice(5,7),16);
+    const r2=parseInt(c2.slice(1,3),16),g2=parseInt(c2.slice(3,5),16),b2=parseInt(c2.slice(5,7),16);
+    const r=Math.round(lerp(r1,r2,t)),g=Math.round(lerp(g1,g2,t)),b=Math.round(lerp(b1,b2,t));
+    return `rgb(${r},${g},${b})`;
+  }
+
+  function initParticles(){
+    particles = [];
+    const count = prefersReducedMotion ? 20 : 120;
+    for(let i=0;i<count;i++){
+      particles.push({
+        x: Math.random()*W,
+        y: Math.random()*H,
+        size: Math.random()*3+0.8,
+        speedX: (Math.random()-0.5)*0.4,
+        speedY: (Math.random()-0.5)*0.3-0.2,
+        opacity: Math.random()*0.6+0.2,
+        pulse: Math.random()*Math.PI*2
+      });
+    }
+  }
+
+  function initClouds(){
+    clouds = [];
+    const count = prefersReducedMotion ? 3 : 8;
+    for(let i=0;i<count;i++){
+      clouds.push({
+        x: Math.random()*W,
+        y: Math.random()*H*0.5+50,
+        w: Math.random()*200+100,
+        h: Math.random()*60+30,
+        speed: Math.random()*0.3+0.1,
+        opacity: Math.random()*0.5+0.3,
+        layer: Math.floor(Math.random()*3)
+      });
+    }
+  }
+
+  function drawCloud(x,y,w,h,opacity,progress){
+    ctx.save();
+    const nightReduce = 1 - progress*0.7;
+    ctx.globalAlpha = opacity*nightReduce;
+    const cloudColor = lerpColor('#ffffff','#a0b0d0',progress*0.6);
+    ctx.fillStyle = cloudColor;
+    ctx.beginPath();
+    const r=h*0.5;
+    ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.arc(x+w*0.25,y-r*0.4,r*1.1,0,Math.PI*2);
+    ctx.arc(x+w*0.5,y-r*0.5,r*1.2,0,Math.PI*2);
+    ctx.arc(x+w*0.75,y-r*0.3,r*0.9,0,Math.PI*2);
+    ctx.arc(x+w,y,r*0.8,0,Math.PI*2);
+    ctx.arc(x+w*0.3,y+r*0.3,r*0.7,0,Math.PI*2);
+    ctx.arc(x+w*0.6,y+r*0.2,r*0.8,0,Math.PI*2);
+    ctx.fill();
+
+    if(opacity>0.4){
+      ctx.globalAlpha = 0.25*nightReduce;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(x+w*0.3,y-r*0.8,r*0.6,0,Math.PI*2);
+      ctx.arc(x+w*0.5,y-r*0.9,r*0.5,0,Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawSky(progress){
+    const dayTop = '#2980b9';
+    const dayMid = '#6dd5fa';
+    const dayBot = '#e0f0ff';
+    const duskTop = '#2c1b4d';
+    const duskMid = '#e85d75';
+    const duskBot = '#f7a52a';
+    const nightTop = '#0a0a2e';
+    const nightMid = '#1a1040';
+    const nightBot = '#0d1b3e';
+
+    let topColor,midColor,botColor;
+    if(progress<0.4){
+      const t=progress/0.4;
+      topColor=lerpColor(dayTop,duskTop,t);
+      midColor=lerpColor(dayMid,duskMid,t);
+      botColor=lerpColor(dayBot,duskBot,t);
+    }else{
+      const t=(progress-0.4)/0.6;
+      topColor=lerpColor(duskTop,nightTop,t);
+      midColor=lerpColor(duskMid,nightMid,t);
+      botColor=lerpColor(duskBot,nightBot,t);
+    }
+
+    const grad=ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,topColor);
+    grad.addColorStop(0.4,midColor);
+    grad.addColorStop(1,botColor);
+    ctx.fillStyle=grad;
+    ctx.fillRect(0,0,W,H);
+  }
+
+  function drawSun(progress){
+    const sunY = lerp(H*0.18, H*0.5, progress);
+    const sunX = W*0.75;
+    if(progress>0.55) return;
+
+    const alpha=1-progress*1.5;
+    const sunColor=lerpColor('#ffe066','#ff6b4a',progress);
+
+    ctx.save();
+    ctx.globalAlpha = Math.max(0,alpha);
+
+    const glowGrad=ctx.createRadialGradient(sunX,sunY,10,sunX,sunY,180);
+    glowGrad.addColorStop(0,'rgba(255,240,180,0.5)');
+    glowGrad.addColorStop(0.3,'rgba(255,180,100,0.2)');
+    glowGrad.addColorStop(1,'rgba(255,100,50,0)');
+    ctx.fillStyle=glowGrad;
+    ctx.beginPath();
+    ctx.arc(sunX,sunY,180,0,Math.PI*2);
+    ctx.fill();
+
+    const sunGrad=ctx.createRadialGradient(sunX,sunY,0,sunX,sunY,45);
+    sunGrad.addColorStop(0,'#fffde0');
+    sunGrad.addColorStop(0.4,sunColor);
+    sunGrad.addColorStop(1,'rgba(255,140,50,0)');
+    ctx.fillStyle=sunGrad;
+    ctx.beginPath();
+    ctx.arc(sunX,sunY,45,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawCity(progress){
+    const cityY = H*0.82;
+    const buildings=[];
+    const seed=42;
+    let x=0;
+    while(x<W){
+      const w=20+Math.sin(x*0.1+seed)*15+Math.random()*30;
+      const h=60+Math.sin(x*0.05)*40+Math.random()*100;
+      buildings.push({x,w,h});
+      x+=w+Math.random()*10+2;
+    }
+
+    ctx.save();
+    const alpha=0.85+progress*0.15;
+    ctx.globalAlpha=alpha;
+
+    buildings.forEach(b=>{
+      const darken=0.6+progress*0.3;
+      const r=Math.round(lerp(30,15,darken));
+      const g=Math.round(lerp(40,18,darken));
+      const bl=Math.round(lerp(60,30,darken));
+      ctx.fillStyle=`rgb(${r},${g},${bl})`;
+      ctx.fillRect(b.x,cityY-b.h,b.w,b.h);
+
+      if(progress>0.1){
+        const windowAlpha=(progress-0.1)*1.5;
+        ctx.globalAlpha=alpha*Math.min(1,windowAlpha)*0.9;
+        for(let wy=cityY-b.h+8;wy<cityY-4;wy+=14){
+          for(let wx=b.x+5;wx<b.x+b.w-4;wx+=10){
+            if(Math.random()>0.55){
+              const warm=Math.random()*0.4+0.6;
+              ctx.fillStyle=`rgba(255,${Math.round(200*warm)},${Math.round(130*warm)},${0.7+Math.random()*0.3})`;
+              ctx.fillRect(wx,wy,3,3);
+            }
+          }
+        }
+      }
+    });
+    ctx.restore();
+  }
+
+  function drawStars(progress){
+    if(progress<0.25) return;
+    const alpha=(progress-0.25)*2.5;
+    ctx.save();
+    ctx.globalAlpha=Math.min(1,alpha)*0.9;
+
+    const starCount=200;
+    for(let i=0;i<starCount;i++){
+      const sx=(i*7919+397)%W;
+      const sy=((i*6271+139)%(H*0.45))+10;
+      const size=(i%3)*0.4+0.5;
+      const twinkle=Math.sin(time*0.003+i*13.7)*0.4+0.6;
+      ctx.fillStyle=`rgba(255,255,255,${0.4+twinkle*0.6})`;
+      ctx.beginPath();
+      ctx.arc(sx,sy,size,0,Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawParticles(time){
+    ctx.save();
+    particles.forEach(p=>{
+      p.x+=p.speedX*(prefersReducedMotion?0.1:1);
+      p.y+=p.speedY*(prefersReducedMotion?0.1:1);
+      if(p.x<0)p.x=W;
+      if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H;
+      if(p.y>H)p.y=0;
+      if(prefersReducedMotion) return;
+
+      const pulse=Math.sin(time*0.003+p.pulse)*0.3+0.7;
+      const alpha=p.opacity*pulse;
+      const nightGlow=scrollProgress>0.4?(scrollProgress-0.4)*1.5:0;
+      const color=scrollProgress>0.5
+        ?`rgba(180,200,255,${alpha})`
+        :`rgba(255,255,255,${alpha})`;
+
+      ctx.fillStyle=color;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.size*(0.8+pulse*0.4),0,Math.PI*2);
+      ctx.fill();
+
+      if(nightGlow>0.3&&p.size>2){
+        ctx.fillStyle=`rgba(180,200,255,${alpha*0.3})`;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.size*2.5,0,Math.PI*2);
+        ctx.fill();
+      }
+    });
+    ctx.restore();
+  }
+
+  function spawnShootingStar(){
+    if(Math.random()<0.003&&shootingStars.length<(prefersReducedMotion?0:2)){
+      shootingStars.push({
+        x:Math.random()*W*0.8+W*0.1,
+        y:Math.random()*H*0.3+20,
+        life:1,
+        speed:Math.random()*0.02+0.01,
+        length:Math.random()*80+60
+      });
+    }
+  }
+
+  function drawShootingStars(time){
+    spawnShootingStar();
+    ctx.save();
+    shootingStars=shootingStars.filter(s=>s.life>0);
+    shootingStars.forEach(s=>{
+      if(prefersReducedMotion){s.life=0;return}
+      s.x-=2;
+      s.y+=1.2;
+      s.life-=s.speed;
+      const alpha=s.life;
+      const grad=ctx.createLinearGradient(s.x,s.y,s.x+s.length,s.y-s.length*0.5);
+      grad.addColorStop(0,`rgba(255,255,255,${alpha})`);
+      grad.addColorStop(1,`rgba(255,255,255,0)`);
+      ctx.strokeStyle=grad;
+      ctx.lineWidth=1.5;
+      ctx.beginPath();
+      ctx.moveTo(s.x,s.y);
+      ctx.lineTo(s.x+s.length,s.y-s.length*0.5);
+      ctx.stroke();
+    });
+    ctx.restore();
+  }
+
+  function drawLensFlare(progress){
+    if(progress>0.4) return;
+    const sx=W*0.75;
+    const sy=lerp(H*0.18,H*0.5,progress);
+    const alpha=1-progress*2;
+    ctx.save();
+    ctx.globalAlpha=Math.max(0,alpha*0.08);
+    const flareGrad=ctx.createRadialGradient(sx,sy,0,sx,sy,W);
+    flareGrad.addColorStop(0,'rgba(255,220,150,0.6)');
+    flareGrad.addColorStop(0.2,'rgba(255,180,100,0.1)');
+    flareGrad.addColorStop(1,'rgba(255,100,50,0)');
+    ctx.fillStyle=flareGrad;
+    ctx.fillRect(0,0,W,H);
+
+    for(let i=0;i<5;i++){
+      const ringX=sx+(i-2)*W*0.06;
+      const ringY=sy+(i-2)*H*0.04;
+      ctx.globalAlpha=Math.max(0,alpha*0.03*(1-Math.abs(i-2)*0.2));
+      ctx.fillStyle='rgba(255,200,150,0.6)';
+      ctx.beginPath();
+      ctx.arc(ringX,ringY,15+i*8,0,Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawHorizonHaze(progress){
+    ctx.save();
+    const hazeY=H*0.78;
+    const hazeGrad=ctx.createLinearGradient(0,hazeY-80,0,hazeY+40);
+    const hazeColor=progress>0.4
+      ?`rgba(40,20,50,0.25)`
+      :`rgba(200,180,220,0.2)`;
+    hazeGrad.addColorStop(0,'rgba(0,0,0,0)');
+    hazeGrad.addColorStop(0.5,hazeColor);
+    hazeGrad.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=hazeGrad;
+    ctx.fillRect(0,hazeY-80,W,120);
+    ctx.restore();
+  }
+
+  function render(timestamp){
+    if(prefersReducedMotion){
+      ctx.clearRect(0,0,W,H);
+      drawSky(scrollProgress);
+      drawSun(scrollProgress);
+      drawCity(scrollProgress);
+      drawStars(scrollProgress);
+      return;
+    }
+
+    time=timestamp;
+    scrollProgress=lerp(scrollProgress,targetProgress,0.04);
+    ctx.clearRect(0,0,W,H);
+
+    drawSky(scrollProgress);
+    drawHorizonHaze(scrollProgress);
+
+    clouds.forEach(c=>{
+      c.x+=c.speed*(1+c.layer*0.5);
+      if(c.x>W+200)c.x=-c.w;
+      const parallaxY=c.y-scrollProgress*c.layer*60;
+      drawCloud(c.x,parallaxY,c.w,c.h,c.opacity+0.1*c.layer,scrollProgress);
+    });
+
+    drawSun(scrollProgress);
+    drawLensFlare(scrollProgress);
+    drawCity(scrollProgress);
+    drawStars(scrollProgress);
+    drawParticles(time);
+    drawShootingStars(time);
+
+    requestAnimationFrame(render);
+  }
+
+  function updateScroll(){
+    const scrollY=window.scrollY||window.pageYOffset;
+    const maxScroll=document.documentElement.scrollHeight-window.innerHeight;
+    targetProgress=Math.min(1,Math.max(0,scrollY/maxScroll));
+
+    if(scrollY>50) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+  }
+
+  function handleMouseMove(e){
+    mouseX=e.clientX/W;
+    mouseY=e.clientY/H;
+  }
+
+  /* Reveal on scroll */
+  function handleReveal(){
+    const reveals=document.querySelectorAll('[data-reveal]');
+    reveals.forEach(el=>{
+      const rect=el.getBoundingClientRect();
+      if(rect.top<window.innerHeight*0.85){
+        el.style.opacity='1';
+        el.style.transform='translateY(0)';
+      }
+    });
+  }
+
+  /* Button particle burst */
+  function createButtonParticles(e){
+    if(prefersReducedMotion) return;
+    const btn=btnPrimary;
+    const rect=btn.getBoundingClientRect();
+    const cx=rect.left+rect.width/2;
+    const cy=rect.top+rect.height/2;
+    const particleCount=12;
+    for(let i=0;i<particleCount;i++){
+      const angle=(Math.PI*2/particleCount)*i;
+      const el=document.createElement('div');
+      const size=Math.random()*4+3;
+      el.style.cssText=`
+        position:fixed;z-index:9999;pointer-events:none;
+        width:${size}px;height:${size}px;border-radius:50%;
+        background:rgba(255,255,255,0.9);
+        left:${cx}px;top:${cy}px;
+        box-shadow:0 0 ${size*2}px rgba(200,220,255,0.6);
+        transition:all 0.7s cubic-bezier(0.25,0.46,0.45,0.94);
+      `;
+      document.body.appendChild(el);
+      requestAnimationFrame(()=>{
+        el.style.transform=`translate(${Math.cos(angle)*50}px,${Math.sin(angle)*50}px)`;
+        el.style.opacity='0';
+      });
+      setTimeout(()=>el.remove(),750);
+    }
+  }
+
+  /* Generate train city buildings */
+  function buildTrainCity(){
+    const city=document.getElementById('trainCity');
+    if(!city) return;
+    city.innerHTML='';
+    const w=city.clientWidth||city.parentElement.clientWidth;
+    let x=0;
+    while(x<w){
+      const bw=Math.random()*40+20;
+      const bh=Math.random()*60+30;
+      const b=document.createElement('div');
+      b.className='city-building';
+      b.style.cssText=`left:${x}px;width:${bw}px;height:${bh}px`;
+      city.appendChild(b);
+
+      for(let wy=4;wy<bh-4;wy+=8){
+        for(let wx=3;wx<bw-3;wx+=7){
+          if(Math.random()>0.5){
+            const win=document.createElement('div');
+            win.className='city-window';
+            win.style.cssText=`left:${wx}px;bottom:${wy}px;--duration:${2+Math.random()*3}s;--delay:${Math.random()*2}s`;
+            b.appendChild(win);
+          }
+        }
+      }
+      x+=bw+Math.random()*8+3;
+    }
+  }
+
+  /* Init reveals */
+  document.querySelectorAll('[data-reveal]').forEach(el=>{
+    el.style.opacity='0';
+    el.style.transform='translateY(30px)';
+    el.style.transition='opacity 0.7s ease-out, transform 0.7s ease-out';
+  });
+
+  /* Events */
+  window.addEventListener('resize',()=>{resize();buildTrainCity();});
+  window.addEventListener('scroll',()=>{updateScroll();handleReveal();});
+  if(!prefersReducedMotion){
+    document.addEventListener('mousemove',handleMouseMove);
+  }
+  btnPrimary.addEventListener('click',createButtonParticles);
+
+  resize();
+  updateScroll();
+  handleReveal();
+  buildTrainCity();
+  if(!prefersReducedMotion) requestAnimationFrame(render);
+  else render(0);
+})();
+</script>
+</body>
+</html>

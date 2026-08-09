@@ -1,0 +1,85 @@
+<!-- 电商商城页面。浏览和购买宠物/植物相关商品。 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>精选好物 - AnimeAI</title>
+    <link rel="stylesheet" href="/css/shop.css?v=20260803-5">
+    <style>
+        body{overflow-x:hidden}
+        body:before{content:"";position:fixed;inset:-20%;z-index:-1;
+          background:
+            radial-gradient(ellipse at 15% 10%,rgba(255,200,160,.15),transparent 50%),
+            radial-gradient(ellipse at 80% 85%,rgba(180,140,200,.1),transparent 50%),
+            radial-gradient(ellipse at 50% 40%,rgba(255,240,210,.08),transparent 60%);
+        }
+        .hero .hero-icon{width:52px;height:52px;display:grid;place-items:center;
+          font-size:26px;border-radius:16px;
+          background:linear-gradient(135deg,rgba(255,255,255,.85),rgba(255,235,210,.55));
+          box-shadow:0 8px 24px rgba(200,140,100,.12);flex-shrink:0;
+        }
+        .hero-content{flex:1}
+        .film-strip{position:fixed;bottom:0;left:0;right:0;height:3px;z-index:1;
+          background:linear-gradient(90deg,transparent,rgba(212,152,106,.2) 20%,rgba(232,184,150,.4) 50%,rgba(212,152,106,.2) 80%,transparent);
+        }
+    </style>
+</head>
+<body>
+<div class="film-strip"></div>
+<header>
+    <h2>🛒 精选好物</h2>
+    <div class="tabs">
+        <button id="plantTab" onclick="location.href='/care'">植物护理</button>
+        <button id="petTab" onclick="location.href='/care?type=PET'">宠物护理</button>
+        <button id="shopTab" class="active">电商平台</button>
+    </div>
+    <div class="nav"><span id="userName"></span><button onclick="location.href='/home'">切换系统</button><button onclick="logout()">退出</button></div>
+</header>
+<main>
+    <section class="hero">
+        <div class="hero-icon">🎁</div>
+        <div class="hero-content">
+            <h1>发现精选好物</h1>
+            <p>浏览商品，管理店铺，开启你的电商之旅</p>
+        </div>
+        <button class="primary" onclick="location.href='/shop-publish'" style="padding:16px 30px;font-size:16px;">+ 发布商品</button>
+    </section>
+    <div class="filter-bar">
+        <input type="text" id="searchInput" placeholder="搜索商品..." oninput="handleSearch()">
+        <select id="categoryFilter" onchange="handleFilter()">
+            <option value="">全部分类</option>
+        </select>
+        <select id="sortFilter" onchange="handleSort()">
+            <option value="default">默认排序</option>
+            <option value="price_asc">价格从低到高</option>
+            <option value="price_desc">价格从高到低</option>
+        </select>
+        <select id="statusFilter" onchange="handleFilter()">
+            <option value="">全部状态</option>
+            <option value="ON">在售</option>
+            <option value="OFF">已下架</option>
+        </select>
+        <button class="minor" onclick="resetFilters()">重置</button>
+    </div>
+    <div class="stats-bar">
+        <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">总商品</div></div>
+        <div class="stat-card"><div class="stat-value" id="statOn">0</div><div class="stat-label">在售</div></div>
+        <div class="stat-card"><div class="stat-value" id="statOff">0</div><div class="stat-label">已下架</div></div>
+    </div>
+    <div id="productGrid" class="cards"></div>
+    <div id="pagination" class="pagination"></div>
+</main>
+<div id="toast"></div>
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">商品详情</h3>
+            <button class="close-btn" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+    </div>
+</div>
+<script src="/js/shop.js"></script>
+</body>
+</html>

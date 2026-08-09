@@ -1,0 +1,193 @@
+/*
+ * 商城模块 Shinkai 风格样式表。定义商品卡片、分类导航、购物车等电商组件样式。
+ */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
+
+*{box-sizing:border-box}
+body{margin:0;font-family:"Noto Sans SC","Microsoft YaHei",sans-serif;
+  background:linear-gradient(150deg,#fef3e8 0%,#ffe8d6 25%,#fef9f3 50%,#e8f0f8 75%,#f0e6f4 100%);
+  color:#3d2e24;min-height:100vh;
+}
+/* ===== HEADER ===== */
+header{height:70px;background:rgba(255,255,255,.62);display:flex;align-items:center;justify-content:space-between;
+  padding:0 5%;backdrop-filter:blur(16px);border-bottom:1px solid rgba(200,160,120,.2);
+  box-shadow:0 2px 18px rgba(120,80,40,.04);position:sticky;top:0;z-index:5;
+}
+header h2{margin:0;font-family:"Noto Serif SC";color:#6b4c3b}
+.nav button,.tabs button{border:0;background:transparent;padding:11px 18px;border-radius:22px;
+  cursor:pointer;font-size:15px;transition:.25s;font-family:"Noto Sans SC","Microsoft YaHei",sans-serif;color:#7a5d4a;
+}
+.tabs button.active{background:linear-gradient(135deg,#d4986a,#e8b896);color:#fff;box-shadow:0 4px 16px rgba(200,140,100,.22)}
+.tabs button:hover:not(.active){background:rgba(200,150,110,.1);color:#6b4c3b}
+.nav button{color:#7a5d4a}
+.nav button:hover{color:#4a3020}
+
+main{max-width:1200px;margin:28px auto;padding:0 20px}
+
+/* ===== HERO ===== */
+.hero{padding:34px;border-radius:24px;
+  background:linear-gradient(135deg,rgba(255,255,255,.68),rgba(255,245,235,.52));
+  display:flex;align-items:center;justify-content:space-between;gap:25px;margin-bottom:22px;
+  border:1px solid rgba(220,180,140,.25);backdrop-filter:blur(14px);
+  box-shadow:0 12px 40px rgba(120,80,40,.05);
+  animation:cardReveal .7s ease-out;
+}
+.hero h1{font-family:"Noto Serif SC";font-size:28px;margin:0 0 8px;color:#4a3020}
+.hero p{color:#8a6d58;margin:0;font-size:14px}
+
+/* ===== FILTER BAR ===== */
+.filter-bar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:20px;
+  padding:16px 20px;background:rgba(255,255,255,.58);border-radius:18px;
+  border:1px solid rgba(220,180,140,.18);backdrop-filter:blur(12px);
+  box-shadow:0 4px 18px rgba(120,80,40,.03);
+}
+.filter-bar input,.filter-bar select{padding:10px 14px;border:1px solid rgba(200,160,120,.25);
+  border-radius:10px;font-size:14px;color:#4a3020;background:rgba(255,255,255,.6);outline:none;transition:.25s;
+}
+.filter-bar input:focus,.filter-bar select:focus{border-color:#d4986a;
+  box-shadow:0 0 0 4px rgba(210,150,100,.08);
+}
+.filter-bar input{flex:1;min-width:200px;max-width:300px}
+.filter-bar select{min-width:120px}
+
+/* ===== BUTTONS ===== */
+.primary,.minor{border:0;border-radius:10px;padding:10px 16px;cursor:pointer;font-size:14px;font-weight:600;transition:.25s;
+  font-family:"Noto Sans SC","Microsoft YaHei",sans-serif;
+}
+.primary{background:linear-gradient(135deg,#d4986a,#e8b896);color:#fff;box-shadow:0 4px 14px rgba(200,140,100,.18)}
+.primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(200,140,100,.28)}
+.minor{background:rgba(200,150,110,.1);color:#7a5d4a}
+.minor:hover{background:rgba(200,150,110,.18);color:#4a3020}
+
+/* ===== STATS BAR ===== */
+.stats-bar{display:flex;gap:14px;margin-bottom:22px}
+.stat-card{flex:1;padding:18px 22px;background:rgba(255,255,255,.58);border-radius:16px;
+  text-align:center;border:1px solid rgba(220,180,140,.18);backdrop-filter:blur(10px);
+  box-shadow:0 4px 16px rgba(120,80,40,.03);transition:.3s;
+}
+.stat-card:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(120,80,40,.06)}
+.stat-card .stat-value{font-family:"Noto Serif SC";font-size:30px;font-weight:700;color:#c4885a}
+.stat-card .stat-label{font-size:12px;color:#8a6d58;margin-top:4px}
+
+/* ===== PRODUCT CARDS ===== */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;margin-bottom:30px}
+.card{background:rgba(255,255,255,.6);border-radius:18px;padding:18px;
+  box-shadow:0 4px 18px rgba(120,80,40,.03);transition:all .3s cubic-bezier(.22,.61,.36,1);
+  cursor:pointer;border:1px solid rgba(220,180,140,.18);
+  animation:cardReveal .5s ease-out both;
+}
+.card:hover{transform:translateY(-5px);border-color:rgba(200,150,110,.35);
+  box-shadow:0 12px 36px rgba(120,80,40,.08);
+}
+.card-img{width:100%;height:180px;background:rgba(245,235,220,.45);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:12px;
+}
+.card-img img{width:100%;height:100%;object-fit:cover}
+.card-img .no-img{font-size:32px;color:#c4a48a}
+.card h4{margin:0 0 6px;font-family:"Noto Serif SC";font-size:16px;color:#4a3020}
+.card .desc{font-size:13px;color:#8a6d58;line-height:1.5;margin-bottom:10px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.card .meta{display:flex;justify-content:space-between;align-items:center}
+.card .price{font-family:"Noto Serif SC";font-size:20px;font-weight:700;color:#c4885a}
+.card .stock{font-size:12px;color:#9a7d68}
+.card .category-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(200,160,120,.15)}
+.card .category-tag{padding:3px 9px;background:rgba(200,150,110,.1);color:#7a5d4a;border-radius:7px;font-size:11px}
+.card .status{display:inline-block;padding:3px 10px;border-radius:7px;font-size:11px;font-weight:600;margin-bottom:8px}
+.card .status.on{background:rgba(100,180,100,.1);color:#4a8a5a}
+.card .status.off{background:rgba(200,150,100,.1);color:#b08040}
+
+/* ===== PAGINATION ===== */
+.pagination{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:20px}
+.pagination button{min-width:36px;height:36px;border:1px solid rgba(200,160,120,.25);
+  border-radius:9px;background:rgba(255,255,255,.5);color:#7a5d4a;cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;transition:.25s;
+}
+.pagination button:hover{border-color:#d4986a;color:#d4986a;background:rgba(255,255,255,.7)}
+.pagination button.active{background:linear-gradient(135deg,#d4986a,#e8b896);color:#fff;border-color:#d4986a}
+.pagination button:disabled{opacity:.4;cursor:not-allowed}
+.pagination .page-info{color:#8a6d58;font-size:13px;margin:0 8px}
+
+/* ===== TOAST ===== */
+#toast{position:fixed;right:25px;bottom:25px;background:rgba(60,35,20,.9);color:#fef3e8;
+  padding:12px 20px;border-radius:12px;display:none;z-index:10;
+  backdrop-filter:blur(12px);box-shadow:0 8px 28px rgba(60,35,20,.2);
+  animation:toastIn .3s ease-out;
+}
+
+/* ===== PANEL ===== */
+.panel{background:rgba(255,255,255,.62);border-radius:20px;padding:28px;
+  border:1px solid rgba(220,180,140,.2);backdrop-filter:blur(12px);
+  box-shadow:0 6px 24px rgba(120,80,40,.04);
+  animation:cardReveal .5s ease-out;
+}
+.panel h3{font-family:"Noto Serif SC";margin:0 0 24px;color:#4a3020}
+.form-item{margin-bottom:20px}
+.form-item label{display:block;font-size:14px;font-weight:600;color:#7a5d4a;margin-bottom:6px}
+.form-item label .required{color:#d46464}
+.form-item input,.form-item textarea,.form-item select{width:100%;padding:12px;
+  border:1px solid rgba(200,160,120,.3);border-radius:10px;font:inherit;color:#4a3020;
+  background:rgba(255,255,255,.6);outline:none;transition:.25s;
+}
+.form-item input:focus,.form-item textarea:focus,.form-item select:focus{border-color:#d4986a;
+  box-shadow:0 0 0 4px rgba(210,150,100,.06);
+}
+.form-item textarea{resize:vertical;min-height:80px}
+.form-row{display:flex;gap:16px}
+.form-row .form-item{flex:1}
+.category-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.category-tag{display:inline-flex;align-items:center;gap:4px;padding:6px 13px;
+  background:rgba(200,150,110,.1);color:#7a5d4a;border-radius:8px;font-size:13px;
+}
+.category-tag .remove{width:19px;height:19px;border-radius:50%;background:rgba(0,0,0,.08);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;transition:.2s;
+}
+.category-tag .remove:hover{background:#d46464;color:#fff}
+
+/* ===== MODAL ===== */
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(40,25,15,.45);
+  display:none;align-items:center;justify-content:center;padding:20px;z-index:100;
+  backdrop-filter:blur(4px);
+}
+.modal.active{display:flex;animation:modalIn .3s ease-out}
+.modal-content{background:rgba(255,255,255,.92);border-radius:22px;max-width:600px;width:100%;max-height:80vh;
+  overflow-y:auto;backdrop-filter:blur(20px);border:1px solid rgba(220,180,140,.2);
+  box-shadow:0 20px 60px rgba(60,35,20,.12);
+}
+.modal-header{display:flex;justify-content:space-between;align-items:center;
+  padding:20px 24px;border-bottom:1px solid rgba(200,160,120,.15);
+}
+.modal-header h3{margin:0;font-family:"Noto Serif SC";color:#4a3020}
+.close-btn{width:32px;height:32px;border:0;border-radius:50%;
+  background:rgba(200,150,110,.1);color:#7a5d4a;cursor:pointer;font-size:20px;
+  display:flex;align-items:center;justify-content:center;transition:.2s;
+}
+.close-btn:hover{background:rgba(200,150,110,.2);color:#4a3020}
+.modal-body{padding:20px 24px}
+.modal-body .modal-img{width:100%;height:200px;background:rgba(245,235,220,.45);border-radius:14px;
+  display:flex;align-items:center;justify-content:center;margin-bottom:16px;overflow:hidden;
+}
+.modal-body .modal-img img{width:100%;height:100%;object-fit:cover}
+.modal-body .modal-desc{color:#8a6d58;line-height:1.7;margin-bottom:16px}
+.modal-body .modal-details{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-body .detail-item{padding:14px;background:rgba(245,235,220,.35);border-radius:11px}
+.modal-body .detail-item .label{font-size:11px;color:#9a7d68}
+.modal-body .detail-item .value{font-family:"Noto Serif SC";font-size:15px;font-weight:600;color:#4a3020;margin-top:4px}
+.modal-body .detail-item .value.price{color:#c4885a}
+
+/* ===== ANIMATIONS ===== */
+@keyframes cardReveal{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes modalIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:768px){
+    header{padding:0 15px}
+    .hero{flex-direction:column;text-align:center}
+    .filter-bar{flex-direction:column}
+    .filter-bar input{max-width:100%;min-width:100%}
+    .stats-bar{flex-wrap:wrap}
+    .stat-card{min-width:140px}
+    .cards{grid-template-columns:1fr}
+    .form-row{flex-direction:column}
+}

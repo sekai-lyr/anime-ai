@@ -1,0 +1,249 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AnimeAI · 写下序章</title>
+<style>
+:root {
+  --night-blue: #09182B;
+  --deep-blue: #0D1F3C;
+  --sky-blue: #5688B5;
+  --rain-blue: #789CB7;
+  --sunset-gold: #E1A05D;
+  --cloud-warm: #C98C82;
+  --warm-white: #F3EDE3;
+  --muted-white: #C2CCD5;
+  --panel-bg: rgba(8,20,40,0.72);
+  --panel-border: rgba(255,255,255,0.13);
+  --input-bg: rgba(8,18,34,0.55);
+  --input-border: rgba(255,255,255,0.11);
+  --font-title: "Noto Serif SC","Source Han Serif SC","Songti SC","STSong",serif;
+  --font-body: "HarmonyOS Sans SC","Source Han Sans SC","Microsoft YaHei",sans-serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{font-family:var(--font-body);color:var(--warm-white);background:var(--night-blue);overflow:hidden;min-height:100vh;min-height:100dvh;line-height:1.6}
+
+.bg-video{position:fixed;inset:0;z-index:0;min-width:100%;min-height:100%;width:auto;height:auto;object-fit:cover;background:var(--night-blue);image-rendering:auto;-webkit-transform:translateZ(0);transform:translateZ(0);will-change:transform}
+.bg-vignette{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(8,20,40,.25) 100%)}
+.bg-fallback{position:fixed;inset:0;z-index:0;background:var(--night-blue) center/cover no-repeat;background-image:url(/assets/anime-login.webp);display:none}
+.bg-video.failed~.bg-vignette,.bg-video.failed+.bg-fallback{display:none}
+.bg-video.failed+.bg-fallback{display:block}
+
+.content{position:relative;z-index:1;display:flex;align-items:center;min-height:100vh;min-height:100dvh;padding:clamp(24px,5vw,80px) clamp(20px,5vw,80px)}
+
+.brand{flex:1 1 58%;display:flex;flex-direction:column;justify-content:center;padding-right:clamp(30px,4vw,60px)}
+.eyebrow{display:flex;align-items:center;gap:12px;font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:rgba(243,237,227,.68);font-family:var(--font-body);font-weight:400;opacity:0;animation:fadeUp .8s cubic-bezier(.22,1,.36,1) .12s forwards}
+.eyebrow::before{content:'';display:block;width:32px;height:1px;background:rgba(243,237,227,.38);border-radius:.5px}
+.main-title{font-family:var(--font-title);font-size:clamp(36px,5vw,62px);font-weight:600;line-height:1.18;letter-spacing:.02em;color:var(--warm-white);text-shadow:0 2px 14px rgba(2,8,18,.28);margin-bottom:26px}
+.main-title .l1{display:block;opacity:0;animation:fadeUp .85s cubic-bezier(.22,1,.36,1) .26s forwards}
+.main-title .l2{display:block;opacity:0;animation:fadeUp .85s cubic-bezier(.22,1,.36,1) .40s forwards}
+.sub{font-size:15px;line-height:1.85;color:rgba(243,237,227,.58);max-width:500px;margin-bottom:34px;opacity:0;animation:fadeUp .75s cubic-bezier(.22,1,.36,1) .58s forwards}
+.divider{width:48px;height:1px;background:rgba(243,237,227,.18);border-radius:.5px;margin-bottom:18px;opacity:0;animation:fadeIn .5s ease .62s forwards}
+.tags{display:flex;gap:26px;font-size:13px;color:rgba(194,204,213,.58);letter-spacing:.04em;opacity:0;animation:fadeIn .5s ease .66s forwards}
+
+.panel-col{flex:0 0 32%;max-width:430px;min-width:330px;display:flex;flex-direction:column;opacity:0;animation:fadeRight .85s cubic-bezier(.22,1,.36,1) .30s forwards}
+.panel{background:var(--panel-bg);backdrop-filter:blur(22px) saturate(112%);-webkit-backdrop-filter:blur(22px) saturate(112%);border:1px solid var(--panel-border);border-radius:20px;padding:clamp(28px,4vw,38px) clamp(24px,3.5vw,36px);box-shadow:0 20px 60px rgba(2,8,20,.30)}
+
+.panel-top{display:flex;align-items:center;gap:11px;margin-bottom:22px}
+.panel-top svg{flex-shrink:0}
+.panel-top .pt{font-family:var(--font-title);font-size:15px;font-weight:600;color:var(--warm-white);letter-spacing:.03em}
+.panel-head{margin-bottom:4px}
+.panel-head h2{font-family:var(--font-title);font-size:21px;font-weight:600;color:var(--warm-white);letter-spacing:.03em}
+.panel-head p{font-size:12px;color:rgba(194,204,213,.55);margin-top:3px}
+
+.switch{display:flex;gap:26px;margin-bottom:26px;border-bottom:1px solid rgba(255,255,255,.07)}
+.switch a{font-size:13px;font-weight:500;text-decoration:none;color:rgba(194,204,213,.48);padding-bottom:9px;position:relative;transition:color .2s ease;letter-spacing:.03em}
+.switch a:hover{color:rgba(194,204,213,.75)}
+.switch a.on{color:var(--warm-white)}
+.switch a.on::after{content:'';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);width:22px;height:2px;background:var(--sky-blue);border-radius:1px}
+
+.msg{font-size:12px;padding:9px 14px;border-radius:8px;margin-bottom:18px;display:none;text-align:center;line-height:1.45}
+.msg.ok{display:block;background:rgba(80,180,120,.08);border:1px solid rgba(80,180,120,.18);color:#b0e8c8}
+.msg.err{display:block;background:rgba(220,100,80,.07);border:1px solid rgba(220,100,80,.14);color:#f0b8a8}
+
+.form{display:flex;flex-direction:column;gap:16px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field span{font-size:12px;color:rgba(194,204,213,.52);letter-spacing:.04em}
+.field input{width:100%;height:50px;padding:0 16px;font-size:14px;font-family:var(--font-body);color:var(--warm-white);background:var(--input-bg);border:1px solid var(--input-border);border-radius:11px;outline:none;transition:all .22s ease}
+.field input::placeholder{color:rgba(194,204,213,.22)}
+.field input:hover{border-color:rgba(255,255,255,.18)}
+.field input:focus{border-color:var(--sky-blue);box-shadow:0 0 0 3px rgba(86,136,181,.10);background:rgba(12,24,42,.60)}
+.field input:focus-visible{outline:2px solid rgba(86,136,181,.25);outline-offset:2px}
+
+.pw-wrap{position:relative;display:flex;align-items:center}
+.pw-wrap input{flex:1;padding-right:48px}
+.toggle{position:absolute;right:13px;top:50%;transform:translateY(-50%);width:22px;height:22px;padding:0;background:none;border:none;cursor:pointer;color:rgba(194,204,213,.38);transition:color .2s ease;display:flex;align-items:center;justify-content:center}
+.toggle:hover{color:rgba(194,204,213,.65)}
+.toggle:focus-visible{outline:2px solid rgba(86,136,181,.25);outline-offset:2px;border-radius:4px}
+.toggle .off{display:none}
+.toggle.show .on{display:none}
+.toggle.show .off{display:block}
+
+.btn{width:100%;height:52px;font-size:15px;font-weight:600;letter-spacing:.06em;color:var(--warm-white);border:none;border-radius:11px;cursor:pointer;background:linear-gradient(135deg,#5688B5 0%,#3a6085 50%,#0D1F3C 100%);transition:all .24s ease;font-family:var(--font-body)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(86,136,181,.18)}
+.btn:active{transform:translateY(0) scale(.99)}
+.btn:focus-visible{outline:2px solid rgba(86,136,181,.35);outline-offset:3px}
+
+.foot{text-align:center;font-size:11px;color:rgba(120,156,183,.40);margin-top:22px;letter-spacing:.03em}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeRight{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .eyebrow,.main-title .l1,.main-title .l2,.sub,.divider,.tags,.panel-col{opacity:1;transform:none}
+  .bg-video{display:none}
+  .bg-fallback{display:block}
+}
+
+@media(max-width:860px){
+  body{overflow-y:auto}
+  .content{flex-direction:column;align-items:stretch;padding:clamp(20px,4vw,36px) 16px 36px;gap:30px;min-height:auto}
+  .brand{flex:auto;padding-right:0;text-align:center}
+  .eyebrow{justify-content:center}
+  .main-title{font-size:clamp(32px,8vw,46px)}
+  .sub{margin:0 auto 28px;font-size:14px}
+  .divider{margin:0 auto 14px}
+  .tags{justify-content:center;gap:18px;font-size:12px}
+  .panel-col{flex:auto;max-width:100%;min-width:0}
+  .panel{padding:26px 22px}
+}
+@media(max-width:480px){
+  .main-title{font-size:clamp(28px,10vw,40px)}
+  .brand{padding:8px 0 0}
+  .sub{font-size:13px;max-width:100%}
+  .tags{gap:13px;font-size:11px;flex-wrap:wrap}
+  .panel{padding:22px 16px;border-radius:16px}
+  .field input{height:48px;font-size:16px}
+  .btn{height:50px;font-size:16px}
+}
+@media(min-width:2000px){
+  .main-title{font-size:66px}
+  .brand{padding-right:80px}
+}
+</style>
+</head>
+<body>
+
+<video class="bg-video" autoplay loop muted playsinline poster="/assets/anime-login.webp">
+  <source src="/assets/anime-login-bg.mp4" type="video/mp4">
+</video>
+<div class="bg-vignette"></div>
+<div class="bg-fallback"></div>
+
+<div class="content">
+
+  <section class="brand">
+    <div class="eyebrow">A New Chapter</div>
+    <h1 class="main-title">
+      <span class="l1">每一次相遇，</span>
+      <span class="l2">都有自己的名字。</span>
+    </h1>
+    <p class="sub">建立你的专属档案，让推荐、提醒、角色识别与漫展计划在同一段旅程中持续生长。</p>
+    <div class="divider"></div>
+    <div class="tags">
+      <span>个性化记忆</span>
+      <span>智能提醒</span>
+      <span>多源实时搜索</span>
+    </div>
+  </section>
+
+  <section class="panel-col">
+    <div class="panel">
+
+      <div class="panel-top">
+        <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+          <circle cx="17" cy="17" r="15" stroke="rgba(243,237,227,0.32)" stroke-width="1.1" stroke-dasharray="70 25" stroke-linecap="round"/>
+          <text x="11" y="22" font-family="serif" font-size="14" fill="rgba(243,237,227,0.82)" font-weight="600">N</text>
+          <path d="M20 7L27 3" stroke="rgba(134,180,210,0.35)" stroke-width="0.7" stroke-linecap="round"/>
+        </svg>
+        <span class="pt">AnimeAI</span>
+      </div>
+
+      <div class="panel-head">
+        <h2>创建账号</h2>
+        <p>写下属于你的第一章</p>
+      </div>
+
+      <nav class="switch">
+        <a href="/login">登录</a>
+        <a class="on" href="/register">注册</a>
+      </nav>
+
+      <div class="msg" id="serverMsg"></div>
+
+      <form id="regForm" class="form">
+        <label class="field">
+          <span>用户名</span>
+          <input id="userName" type="text" minlength="3" maxlength="20" autocomplete="username" placeholder="3–20 个字符" required>
+        </label>
+        <label class="field">
+          <span>密码</span>
+          <div class="pw-wrap">
+            <input type="password" id="pw" minlength="6" autocomplete="new-password" placeholder="至少 6 个字符" required>
+            <button class="toggle" type="button" id="togglePw" aria-label="切换密码可见性">
+              <svg class="on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
+        </label>
+        <label class="field">
+          <span>邮箱 · 可选</span>
+          <input type="email" id="email" autocomplete="email" placeholder="用于完善个人资料">
+        </label>
+        <button class="btn" type="submit">开启旅程</button>
+      </form>
+
+      <p class="foot">所有未完成的故事，都在等待一次重逢。</p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+var v=document.querySelector('.bg-video');
+var p=v.play();
+if(p!==undefined){p.then(function(){}).catch(function(){v.classList.add('failed')})}
+v.addEventListener('error',function(){v.classList.add('failed')});
+v.addEventListener('loadeddata',function(){v.style.opacity='1'});
+document.addEventListener('visibilitychange',function(){if(document.hidden)v.pause();else v.play().catch(function(){})});
+
+var $=function(id){return document.getElementById(id)};
+
+$('togglePw').onclick=function(){
+  var pw=$('pw');
+  var show=pw.type==='password';
+  pw.type=show?'text':'password';
+  this.classList.toggle('show',show);
+};
+
+$('regForm').onsubmit=async function(e){
+  e.preventDefault();
+  var m=$('serverMsg');
+  try{
+    var r=await fetch('/api/auth/register',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({userName:$('userName').value,password:$('pw').value,email:$('email').value})
+    });
+    var d=await r.json();
+    if(d.code===200){
+      m.className='msg ok';
+      m.textContent='账号创建成功，正在进入…';
+      setTimeout(function(){location.href='/chat'},650);
+    }else{
+      m.className='msg err';
+      m.textContent=d.message||'注册失败';
+    }
+  }catch(e){
+    m.className='msg err';
+    m.textContent='暂时无法连接服务器，请稍后重试';
+  }
+};
+</script>
+</body>
+</html>

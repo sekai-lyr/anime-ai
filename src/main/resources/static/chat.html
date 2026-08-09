@@ -1,0 +1,221 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AnimeAI · 天空放映室</title>
+<style>
+:root {
+  --night-blue: #09182B;
+  --deep-blue: #0D1F3C;
+  --sky-blue: #5688B5;
+  --rain-blue: #789CB7;
+  --warm-white: #F3EDE3;
+  --muted-white: #C2CCD5;
+  --panel-bg: rgba(8,20,40,0.68);
+  --panel-border: rgba(255,255,255,0.12);
+  --font-title: "Noto Serif SC","Source Han Serif SC","Songti SC","STSong",serif;
+  --font-body: "HarmonyOS Sans SC","Source Han Sans SC","Microsoft YaHei",sans-serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{font-family:var(--font-body);color:var(--warm-white);background:var(--night-blue);overflow:hidden;height:100vh;height:100dvh;line-height:1.6}
+
+.bg-video{position:fixed;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;background:var(--night-blue)}
+.bg-fallback{position:fixed;inset:0;z-index:0;background:var(--night-blue) center/cover no-repeat;background-image:url(/assets/anime-login.webp);display:none}
+.bg-video.failed+.bg-fallback{display:block}
+
+/* Chat shell */
+.chat-shell{position:relative;z-index:1;display:flex;height:100vh;height:100dvh}
+
+/* Sidebar */
+.chat-sidebar{width:268px;display:flex;flex-direction:column;background:rgba(8,20,40,0.70);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-right:1px solid var(--panel-border);flex-shrink:0;transition:transform .3s ease;z-index:10}
+.chat-logo{display:flex;align-items:center;gap:11px;padding:20px 20px 14px;font-family:var(--font-title);font-size:17px;font-weight:600;letter-spacing:.03em}
+.chat-logo svg{flex-shrink:0}
+.new-chat{display:block;width:calc(100% - 32px);margin:0 16px 18px;padding:11px;font-size:13px;font-weight:500;color:var(--warm-white);background:rgba(255,255,255,.06);border:1px solid var(--panel-border);border-radius:10px;cursor:pointer;transition:all .25s ease;letter-spacing:.03em}
+.new-chat:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2);transform:translateY(-1px)}
+.side-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:rgba(194,204,213,.55);padding:0 20px 10px}
+.prompt-list{padding:0 16px;display:flex;flex-direction:column;gap:5px;flex:1;overflow-y:auto}
+.prompt-chip{width:100%;padding:10px 14px;font-size:12px;color:rgba(194,204,213,.58);background:rgba(255,255,255,.03);border:1px solid transparent;border-radius:9px;cursor:pointer;text-align:left;transition:all .25s ease;line-height:1.45}
+.prompt-chip:hover{border-color:var(--panel-border);background:rgba(255,255,255,.06);color:var(--warm-white)}
+.sidebar-foot{padding:16px;border-top:1px solid var(--panel-border)}
+.user-card{display:flex;align-items:center;gap:12px}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--sky-blue),var(--deep-blue));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.user-meta{flex:1;min-width:0}
+.user-meta strong{display:block;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-meta small{font-size:11px;color:rgba(194,204,213,.5)}
+.logout{padding:6px 14px;font-size:11px;color:rgba(194,204,213,.5);background:rgba(255,255,255,.04);border:1px solid var(--panel-border);border-radius:8px;cursor:pointer;transition:all .2s ease}
+.logout:hover{color:#f0a0a0;border-color:rgba(220,100,100,.3);background:rgba(220,100,100,.06)}
+
+/* Main chat */
+.chat-main{flex:1;display:flex;flex-direction:column;min-width:0;position:relative}
+.chat-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:rgba(8,18,34,0.60);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--panel-border)}
+.chat-topbar h2{font-family:var(--font-title);font-size:16px;letter-spacing:.04em;font-weight:600}
+.chat-topbar .online{font-size:11px;color:rgba(100,200,150,.8);margin-top:2px}
+.chat-topbar .eyebrow{font-size:12px;letter-spacing:.15em;color:rgba(194,204,213,.55);text-transform:uppercase}
+.mobile-menu{display:none;background:none;border:none;color:var(--warm-white);font-size:20px;cursor:pointer;padding:4px 8px;border-radius:6px}
+.mobile-menu:hover{background:rgba(255,255,255,.06)}
+
+.messages{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
+.messages::-webkit-scrollbar{width:4px}
+.messages::-webkit-scrollbar-track{background:transparent}
+.messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
+
+.welcome{text-align:center;padding:clamp(30px,8vh,80px) 20px}
+.welcome .orb{width:58px;height:58px;margin:0 auto 18px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);border:1px solid var(--panel-border);font-family:var(--font-title);font-size:22px}
+.welcome h1{font-family:var(--font-title);font-size:clamp(20px,3vw,28px);font-weight:600;margin-bottom:8px}
+.welcome p{font-size:13px;color:rgba(194,204,213,.58);max-width:380px;margin:0 auto 22px;line-height:1.8}
+.suggestions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.suggestion{padding:8px 16px;font-size:12px;color:rgba(194,204,213,.55);background:rgba(255,255,255,.04);border:1px solid var(--panel-border);border-radius:18px;cursor:pointer;transition:all .22s ease}
+.suggestion:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16);color:var(--warm-white)}
+
+.message{display:flex;max-width:80%}
+.message.user{align-self:flex-end}
+.message.ai{align-self:flex-start}
+.bubble{padding:12px 18px;border-radius:14px;font-size:13px;line-height:1.75;word-break:break-word;position:relative}
+.message.user .bubble{background:rgba(86,136,181,.2);border:1px solid rgba(86,136,181,.22);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom-right-radius:5px}
+.message.ai .bubble{background:rgba(255,255,255,.06);border:1px solid var(--panel-border);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom-left-radius:5px}
+.bubble img{max-width:280px;max-height:200px;border-radius:8px;margin-bottom:8px;display:block}
+.bubble a{color:var(--sky-blue);text-decoration:underline}
+.bubble strong{color:var(--warm-white);font-weight:600}
+.typing{display:flex;gap:4px;padding:4px 0}
+.typing i{width:6px;height:6px;border-radius:50%;background:rgba(194,204,213,.5);animation:typingBounce 1.4s ease-in-out infinite}
+.typing i:nth-child(2){animation-delay:.2s}
+.typing i:nth-child(3){animation-delay:.4s}
+
+.composer-wrap{padding:0 24px 20px}
+.image-preview{display:none;position:relative;margin-bottom:8px;max-width:200px}
+.image-preview.show{display:inline-block}
+.image-preview img{width:100%;border-radius:8px;display:block}
+.image-preview .remove-image{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:rgba(220,80,80,.85);color:white;border:none;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;line-height:1}
+.composer{display:flex;align-items:flex-end;gap:10px;padding:12px 16px;background:rgba(255,255,255,.05);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--panel-border);border-radius:18px;transition:all .22s ease}
+.composer:focus-within{border-color:var(--sky-blue);box-shadow:0 0 0 3px rgba(86,136,181,.08)}
+.composer textarea{flex:1;resize:none;border:none;background:none;color:var(--warm-white);font-size:14px;font-family:var(--font-body);outline:none;max-height:150px;line-height:1.6;padding:4px 0}
+.composer textarea::placeholder{color:rgba(194,204,213,.25)}
+.composer .attach,.composer .send{flex-shrink:0;width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .22s ease}
+.composer .attach{background:rgba(255,255,255,.06);color:rgba(194,204,213,.55)}
+.composer .attach:hover{background:rgba(255,255,255,.12);color:var(--warm-white)}
+.composer .send{background:linear-gradient(135deg,var(--sky-blue),var(--deep-blue));color:var(--warm-white);box-shadow:0 4px 14px rgba(86,136,181,.2)}
+.composer .send:hover{transform:scale(1.05);box-shadow:0 6px 20px rgba(86,136,181,.3)}
+.composer .send:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.composer-note{font-size:10px;color:rgba(194,204,213,.25);text-align:center;margin-top:8px}
+
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:.35}30%{transform:translateY(-6px);opacity:1}}
+
+@media(max-width:850px){
+  .chat-sidebar{position:fixed;top:0;left:0;bottom:0;transform:translateX(-100%);width:268px}
+  .chat-sidebar.open{transform:translateX(0)}
+  .mobile-menu{display:block}
+  .message{max-width:92%}
+  .composer-wrap{padding:0 12px 14px}
+  .chat-topbar{padding:12px 16px}
+  .messages{padding:14px 16px;gap:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .bg-video{display:none}
+  .bg-fallback{display:block}
+}
+</style>
+</head>
+<body>
+
+<video class="bg-video" autoplay loop muted playsinline poster="/assets/anime-login.webp">
+  <source src="/assets/anime-bg.mp4" type="video/mp4">
+</video>
+<div class="bg-fallback"></div>
+
+<main class="chat-shell">
+  <aside class="chat-sidebar" id="sidebar">
+    <div class="chat-logo">
+      <svg width="30" height="30" viewBox="0 0 34 34" fill="none">
+        <circle cx="17" cy="17" r="15" stroke="rgba(243,237,227,0.3)" stroke-width="1" stroke-dasharray="70 25" stroke-linecap="round"/>
+        <text x="11" y="22" font-family="serif" font-size="13" fill="rgba(243,237,227,0.82)" font-weight="600">N</text>
+        <path d="M20 7L27 3" stroke="rgba(134,180,210,0.3)" stroke-width="0.7" stroke-linecap="round"/>
+      </svg>
+      <span>AnimeAI</span>
+    </div>
+    <button class="new-chat" id="newChat">＋ 新的一幕</button>
+    <div class="side-label">灵感入口</div>
+    <div class="prompt-list">
+      <button class="prompt-chip" data-prompt="最近有什么值得看的动漫电影？">最近的动漫电影</button>
+      <button class="prompt-chip" data-prompt="我在杭州，接下来有哪些二次元浓度高的漫展？">附近漫展情报</button>
+      <button class="prompt-chip" data-prompt="推荐几部氛围治愈、画面很美的动画。">治愈系作品推荐</button>
+      <button class="prompt-chip" data-prompt="本季度有哪些值得追的新番？">本季度新番</button>
+    </div>
+    <div class="sidebar-foot">
+      <div class="user-card">
+        <div class="avatar" id="avatar">U</div>
+        <div class="user-meta">
+          <strong id="userName">旅人</strong>
+          <small>天空放映室 · 在线</small>
+        </div>
+        <button class="logout" id="logout" title="退出">退出</button>
+      </div>
+    </div>
+  </aside>
+
+  <section class="chat-main">
+    <header class="chat-topbar">
+      <button class="mobile-menu" id="mobileMenu">☰</button>
+      <div><h2>天空放映室</h2><div class="online">实时工具已连接</div></div>
+      <div class="eyebrow">Scene 01</div>
+    </header>
+    <div class="messages" id="messages">
+      <section class="welcome" id="welcome">
+        <div class="orb">空</div>
+        <h1>想从哪一幕开始？</h1>
+        <p>识别角色、追踪新番、寻找漫展，或只是聊聊那部让你念念不忘的动画。</p>
+        <div class="suggestions">
+          <button class="suggestion" data-prompt="上传截图后，帮我识别角色和对应番剧。">识别一张动画截图</button>
+          <button class="suggestion" data-prompt="查一下最近两个月国内上映的动漫电影和购票情况。">查近期动画电影</button>
+          <button class="suggestion" data-prompt="我在杭州，帮我规划一次纯动漫向漫展行程。">规划漫展行程</button>
+          <button class="suggestion" data-prompt="根据我喜欢的作品，推荐相似动画和游戏。">跨作品推荐</button>
+        </div>
+      </section>
+    </div>
+    <div class="composer-wrap">
+      <div class="image-preview" id="imagePreview">
+        <img id="previewImage" alt="待发送图片">
+        <button class="remove-image" id="removeImage">×</button>
+      </div>
+      <div class="composer">
+        <input hidden type="file" id="imageFile" accept="image/*">
+        <button class="attach" id="attach" title="上传图片">＋</button>
+        <textarea id="input" rows="1" placeholder="写下你的问题，或上传一张动画截图…"></textarea>
+        <button class="send" id="send" title="发送">➤</button>
+      </div>
+      <div class="composer-note">AnimeAI 会调用实时工具核验信息，重要档期请以官方公告为准</div>
+    </div>
+  </section>
+</main>
+
+<script>
+var v=document.querySelector('.bg-video');
+var p=v.play();
+if(p!==undefined){p.then(function(){}).catch(function(){v.classList.add('failed')})}
+v.addEventListener('error',function(){v.classList.add('failed')});
+v.addEventListener('loadeddata',function(){v.style.opacity='1'});
+document.addEventListener('visibilitychange',function(){if(document.hidden)v.pause();else v.play().catch(function(){})});
+
+const $=id=>document.getElementById(id);let imageData=null;let busy=false;
+const conversationId=localStorage.getItem('animeConversationId')||(()=>{const id='anime-'+Date.now()+'-'+Math.random().toString(36).slice(2,9);localStorage.setItem('animeConversationId',id);return id})();
+function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
+function markdown(value){let s=escapeHtml(value);s=s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/^### (.+)$/gm,'<strong>$1</strong>').replace(/\n/g,'<br>');return s}
+function hideWelcome(){const welcome=$('welcome');if(welcome)welcome.remove()}
+function addMessage(role,content,image){hideWelcome();const row=document.createElement('div');row.className='message '+role;const bubble=document.createElement('div');bubble.className='bubble';if(image){const img=document.createElement('img');img.src=image;img.alt='用户上传的图片';bubble.appendChild(img)}const text=document.createElement('div');text.innerHTML=role==='ai'?markdown(content):escapeHtml(content).replace(/\n/g,'<br>');bubble.appendChild(text);row.appendChild(bubble);$('messages').appendChild(row);$('messages').scrollTop=$('messages').scrollHeight;return row}
+function typing(){hideWelcome();const row=document.createElement('div');row.className='message ai';row.innerHTML='<div class="bubble"><span class="typing"><i></i><i></i><i></i></span></div>';$('messages').appendChild(row);$('messages').scrollTop=$('messages').scrollHeight;return row}
+async function send(){const message=$('input').value.trim();if(busy||(!message&&!imageData))return;busy=true;$('send').disabled=true;const pendingImage=imageData;addMessage('user',message||'请识别这张图片',pendingImage);$('input').value='';clearImage();const wait=typing();try{let data;if(pendingImage){const response=await fetch('/api/ai/analyze-image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:pendingImage})});data=await response.json()}else{const response=await fetch('/api/ai/chat-with-tools',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,conversationId})});data=await response.json()}wait.remove();if(data.success)addMessage('ai',data.content||'我完成了查询，但暂时没有可展示的内容。');else addMessage('ai','请求失败：'+(data.error||data.message||'未知错误'))}catch(error){wait.remove();addMessage('ai','连接暂时中断，请稍后再试。')}finally{busy=false;$('send').disabled=false;$('input').focus()}}
+function clearImage(){imageData=null;$('imageFile').value='';$('imagePreview').classList.remove('show');$('previewImage').src=''}
+$('attach').onclick=()=>$('imageFile').click();$('removeImage').onclick=clearImage;$('imageFile').onchange=()=>{const file=$('imageFile').files[0];if(!file)return;if(file.size>10*1024*1024){alert('图片请小于 10MB');return clearImage()}const reader=new FileReader();reader.onload=()=>{imageData=reader.result;$('previewImage').src=imageData;$('imagePreview').classList.add('show')};reader.readAsDataURL(file)};
+$('send').onclick=send;$('input').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}};$('input').oninput=()=>{$('input').style.height='auto';$('input').style.height=Math.min($('input').scrollHeight,150)+'px'};
+document.querySelectorAll('[data-prompt]').forEach(button=>button.onclick=()=>{$('input').value=button.dataset.prompt;$('input').focus();if(innerWidth<851)$('sidebar').classList.remove('open')});
+$('newChat').onclick=()=>{localStorage.removeItem('animeConversationId');location.reload()};$('mobileMenu').onclick=()=>$('sidebar').classList.toggle('open');
+$('logout').onclick=async()=>{await fetch('/api/auth/logout',{method:'POST'});location.href='/login'};
+fetch('/api/auth/me').then(response=>response.json()).then(data=>{if(data.code!==200||!data.data)return location.href='/login';const name=data.data.userName;$('userName').textContent=name;$('avatar').textContent=name.slice(0,1).toUpperCase()}).catch(()=>{});
+async function pollReminders(){try{const response=await fetch('/api/reminders/pending?conversationId='+encodeURIComponent(conversationId));if(!response.ok)return;const data=await response.json();(data.messages||[]).forEach(message=>{addMessage('ai',message);if(Notification.permission==='granted')new Notification('AnimeAI 提醒',{body:message.replace(/[*#]/g,'')})})}catch{}}
+setInterval(pollReminders,5000);pollReminders();if('Notification'in window&&Notification.permission==='default')setTimeout(()=>Notification.requestPermission(),12000);
+</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!-- 功能特性展示页面。展示平台所有AI功能（视觉识别、语音合成、图片生成等）。 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>护理功能中心</title>
+    <link rel="stylesheet" href="/css/cinematic.css?v=20260803-5">
+    <style>
+        body{margin:0;background:linear-gradient(155deg,#d4e8dc 0%,#b8dcc8 28%,#e0f0e5 55%,#f2f7f0 100%);font-family:"Noto Sans SC","Microsoft YaHei",sans-serif;color:#2d5a3f;min-height:100vh}
+        header{background:rgba(255,255,255,.55);color:#2d5a3f;padding:16px 5%;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(14px);border-bottom:1px solid rgba(120,180,140,.2);box-shadow:0 2px 18px rgba(60,120,80,.05)}
+        header a{color:#3a8a58;text-decoration:none;transition:.25s}
+        header a:hover{color:#2d5a3f}
+        .wrap{max-width:1100px;margin:24px auto;padding:0 16px}
+        .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+        .tabs button{border:0;padding:10px 16px;border-radius:22px;cursor:pointer;transition:.25s;font-family:"Noto Sans SC","Microsoft YaHei",sans-serif;font-size:14px;background:rgba(255,255,255,.45);color:#4d8a63;backdrop-filter:blur(8px)}
+        .tabs button:hover{background:rgba(255,255,255,.65);color:#2d5a3f}
+        .tabs button.active{background:linear-gradient(135deg,#3a8a58,#5aad74);color:#fff;box-shadow:0 4px 14px rgba(58,138,88,.22)}
+        .panel{display:none;background:rgba(255,255,255,.58);padding:24px;border-radius:18px;backdrop-filter:blur(12px);border:1px solid rgba(140,200,160,.2);box-shadow:0 6px 24px rgba(60,120,80,.04);animation:textReveal .4s ease-out}
+        .panel.active{display:block}
+        .row{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+        h2{font-family:"Noto Serif SC";color:#2d5a3f}
+        input,select,textarea{padding:10px;border:1px solid rgba(120,180,140,.3);border-radius:9px;box-sizing:border-box;background:rgba(255,255,255,.6);color:#2d5a3f;outline:none;transition:.25s;font:inherit}
+        input:focus,select:focus,textarea:focus{border-color:#5aad74;background:white;box-shadow:0 0 0 4px rgba(90,173,116,.06)}
+        textarea{width:100%;min-height:90px}
+        .action{border:0;border-radius:9px;padding:10px 18px;background:linear-gradient(135deg,#3a8a58,#5aad74);color:#fff;cursor:pointer;transition:.25s;font:inherit;box-shadow:0 3px 12px rgba(58,138,88,.15)}
+        .action:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(58,138,88,.25)}
+        .card{border:1px solid rgba(140,200,160,.18);border-radius:12px;padding:16px;margin:10px 0;background:rgba(255,255,255,.45);backdrop-filter:blur(6px);transition:.25s}
+        .card:hover{border-color:rgba(100,180,130,.35);box-shadow:0 3px 14px rgba(60,120,80,.05)}
+        .muted{color:#6ca07e;font-size:13px}
+        img.timeline{max-width:180px;max-height:150px;border-radius:10px}
+        .result{white-space:pre-wrap;background:rgba(225,245,235,.55);padding:16px;border-radius:10px;margin-top:12px;border-left:4px solid #3a8a58;color:#2d5a3f}
+        code{background:rgba(100,160,120,.08);padding:3px 7px;border-radius:5px;font-size:13px;color:#3a8a58}
+        @keyframes textReveal{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    </style>
+</head>
+<body>
+<header><strong>🐾🌿 护理功能中心</strong><div><a href="/chat">返回聊天</a>　<a href="/shop">商城</a></div></header>
+<div class="wrap">
+    <div class="tabs">
+        <button data-tab="diagnosis">病害识别</button><button data-tab="timeline">成长时间线</button>
+        <button data-tab="brief">每日播报</button><button data-tab="community">社区</button>
+        <button data-tab="inventory">用品库存</button><button data-tab="notify">消息通知</button>
+        <button data-tab="wechat">微信接入</button>
+    </div>
+
+    <section id="diagnosis" class="panel">
+        <h2>植物病虫害 / 宠物皮肤辅助识别</h2>
+        <div class="row"><select id="diagType"><option>PLANT</option><option>PET</option></select><input id="diagTarget" placeholder="档案ID（可选）"><input id="diagImage" type="file" accept="image/*"></div>
+        <textarea id="diagQuestion" placeholder="例如：叶片上的白斑是什么？应该怎么处理？"></textarea>
+        <button class="action" onclick="diagnose()">开始识别</button><div id="diagResult" class="result"></div>
+    </section>
+
+    <section id="timeline" class="panel">
+        <h2>成长时间线</h2>
+        <div class="row"><select id="timeType"><option>PLANT</option><option>PET</option></select><input id="timeTarget" placeholder="档案ID（可选）"><input id="timeImage" type="file" accept="image/*"><input id="timeNote" placeholder="本次记录"></div>
+        <button class="action" onclick="addTimeline()">添加照片</button> <button class="action" onclick="loadTimeline()">刷新时间线</button>
+        <div id="timelineList"></div>
+    </section>
+
+    <section id="brief" class="panel">
+        <h2>智能每日播报</h2><p class="muted">每天 08:00 自动生成；也可以立即刷新。</p>
+        <button class="action" onclick="loadBrief(true)">生成今日简报</button><div id="briefContent" class="result"></div>
+    </section>
+
+    <section id="community" class="panel">
+        <h2>社区问答 / 经验分享</h2>
+        <input id="postTitle" placeholder="标题" style="width:100%"><textarea id="postContent" placeholder="分享问题或护理经验"></textarea>
+        <button class="action" onclick="createPost()">发布</button><div id="postList"></div>
+    </section>
+
+    <section id="inventory" class="panel">
+        <h2>用品库存与补货预测</h2>
+        <div class="row"><input id="invName" placeholder="猫粮/肥料"><input id="invCategory" placeholder="分类"><input id="invQty" type="number" placeholder="余量"><input id="invUnit" placeholder="kg/袋"><input id="invDaily" type="number" step="0.01" placeholder="每日用量"><input id="invThreshold" type="number" placeholder="补货阈值"></div>
+        <button class="action" onclick="saveInventory()">保存用品</button><div id="inventoryList"></div>
+    </section>
+
+    <section id="notify" class="panel">
+        <h2>多设备消息通知</h2><p class="muted">授权浏览器通知后，当前设备会接收每日播报、护理和补货提醒。</p>
+        <button class="action" onclick="enableNotifications()">启用此设备通知</button><div id="notificationList"></div>
+    </section>
+
+    <section id="wechat" class="panel">
+        <h2>微信小程序 / 公众号接入</h2>
+        <p>小程序聊天接口：<code>POST /api/wechat/mini/chat</code></p>
+        <p>公众号服务器回调：<code id="callbackUrl"></code></p>
+        <p class="muted">在服务器环境变量中配置 WECHAT_TOKEN、WECHAT_APP_ID、WECHAT_APP_SECRET 后，将回调地址填写到微信公众平台。</p>
+    </section>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const api=async(url,opt={})=>{const r=await fetch(url,opt),j=await r.json();if(j.code!==200)throw Error(j.message||'请求失败');return j.data};
+const json=body=>({method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+const b64=file=>new Promise((ok,no)=>{if(!file)return no(Error('请选择图片'));const r=new FileReader();r.onload=()=>ok(r.result.split(',')[1]);r.onerror=no;r.readAsDataURL(file)});
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>openTab(b.dataset.tab));
+function openTab(id){document.querySelectorAll('.panel,.tabs button').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelector(`[data-tab="${id}"]`).classList.add('active');if(id==='community')loadPosts();if(id==='inventory')loadInventory();if(id==='notify')loadNotifications();if(id==='timeline')loadTimeline();if(id==='brief')loadBrief(false)}
+async function diagnose(){try{$('diagResult').textContent='识别中…';const d=await api('/api/features/diagnosis',json({targetType:$('diagType').value,targetId:$('diagTarget').value||null,question:$('diagQuestion').value,image:await b64($('diagImage').files[0])}));$('diagResult').textContent=d.diagnosis}catch(e){$('diagResult').textContent=e.message}}
+async function addTimeline(){try{await api('/api/features/timeline',json({targetType:$('timeType').value,targetId:$('timeTarget').value||null,note:$('timeNote').value,image:await b64($('timeImage').files[0])}));loadTimeline()}catch(e){alert(e.message)}}
+async function loadTimeline(){let u='/api/features/timeline?targetType='+$('timeType').value;if($('timeTarget').value)u+='&targetId='+encodeURIComponent($('timeTarget').value);const d=await api(u);$('timelineList').innerHTML=d.map(x=>`<div class=card><img class=timeline src="${x.image_url}"><p>${x.ai_annotation||''}</p><span class=muted>${x.captured_at}</span></div>`).join('')||'<p class=muted>暂无成长记录</p>'}
+async function loadBrief(refresh){try{const d=await api('/api/features/daily-brief?refresh='+refresh);$('briefContent').textContent=d.content}catch(e){$('briefContent').textContent=e.message}}
+async function createPost(){try{await api('/api/features/community/posts',json({title:$('postTitle').value,content:$('postContent').value}));$('postTitle').value=$('postContent').value='';loadPosts()}catch(e){alert(e.message)}}
+async function loadPosts(){const d=await api('/api/features/community/posts');$('postList').innerHTML=d.map(x=>`<div class=card><b>${x.title}</b> <span class=muted>${x.tags||''}</span><p>${x.content}</p><button onclick="likePost(${x.id})">👍 ${x.like_count}</button> <span class=muted>${x.comment_count} 条评论 · ${x.user_id}</span><div><input id="c${x.id}" placeholder="写评论"><button onclick="comment(${x.id})">评论</button></div></div>`).join('')}
+async function likePost(id){await api(`/api/features/community/posts/${id}/like`,json({}));loadPosts()}
+async function comment(id){await api(`/api/features/community/posts/${id}/comments`,json({content:$('c'+id).value}));loadPosts()}
+async function saveInventory(){try{await api('/api/features/inventory',json({name:$('invName').value,category:$('invCategory').value,quantity:$('invQty').value,unit:$('invUnit').value,dailyUsage:$('invDaily').value,reorderThreshold:$('invThreshold').value}));loadInventory()}catch(e){alert(e.message)}}
+async function loadInventory(){const d=await api('/api/features/inventory');$('inventoryList').innerHTML=d.map(x=>`<div class=card><b>${x.name}</b>：${x.quantity}${x.unit||''}　预计 ${x.estimated_days_left??'未知'} 天用完 ${x.needs_reorder?'<strong style="color:#d44">需要补货</strong>':''}<button onclick="consume(${x.id})">消耗1</button>${x.product_id?` <a href="/shop">去购买</a>`:''}</div>`).join('')||'<p class=muted>暂无用品</p>'}
+async function consume(id){await api(`/api/features/inventory/${id}/consume`,json({amount:1}));loadInventory()}
+async function enableNotifications(){if(!('Notification'in window))return alert('浏览器不支持通知');const p=await Notification.requestPermission();if(p!=='granted')return alert('未授权');const reg=await navigator.serviceWorker.register('/service-worker.js');const endpoint=localStorage.pushEndpoint||(localStorage.pushEndpoint='browser://'+crypto.randomUUID());await api('/api/features/push/subscribe',json({endpoint,deviceName:navigator.userAgent}));alert('此设备通知已启用');loadNotifications()}
+async function loadNotifications(){const d=await api('/api/features/notifications');$('notificationList').innerHTML=d.map(x=>`<div class=card><b>${x.title}</b><p>${x.content}</p><span class=muted>${x.created_at}</span></div>`).join('')||'<p class=muted>暂无通知</p>';if(Notification.permission==='granted'&&d[0]&&!d[0].is_read){navigator.serviceWorker.ready.then(r=>r.active.postMessage({title:d[0].title,body:d[0].content}))}}
+$('callbackUrl').textContent=location.origin+'/api/wechat/callback';openTab('diagnosis');setInterval(()=>{if($('notify').classList.contains('active'))loadNotifications()},30000);
+</script>
+</body>
+</html>

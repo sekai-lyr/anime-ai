@@ -1,4 +1,4 @@
-﻿# 馃帉 Anime AI 路 鍔ㄦ极鏅鸿兘鍔╂墜骞冲彴
+# 馃帉 Anime AI 路 鍔ㄦ极鏅鸿兘鍔╂墜骞冲彴
 
 > **鎴浘璇嗙暘 路 瑙掕壊璇嗗埆 路 鐣墽鎼滅储 路 AI 瀵硅瘽 路 RAG 鐭ヨ瘑搴?路 TTS/ASR**
 > Screenshot-to-anime recognition 路 Character ID 路 Anime search 路 AI chat 路 RAG 路 TTS/ASR
@@ -17,7 +17,7 @@ A full-featured **AI assistant platform built around anime**: upload a screensho
 涓€涓互**鍔ㄦ极涓烘牳蹇?*鐨?AI 鏅鸿兘鍔╂墜骞冲彴锛氭埅鍥捐瘑鐣€佽鑹茶瘑鍒€佺暘鍓ф悳绱㈡帹鑽愩€佽拷鐣彁閱掞紝骞堕泦鎴愬ぉ姘斻€佸湴鍥俱€佸疇鐗╂姢鐞嗐€佸浘鐗囩敓鎴愩€佽闊崇瓑澶氭ā鎬?AI 鑳藉姏銆?
 
 <p align="center">
-  <img src="screenshots/demo.gif" alt="Demo" width="720"/>
+  <img src="screenshots/demo.webp" alt="Demo" width="720"/>
 </p>
 ---
 
